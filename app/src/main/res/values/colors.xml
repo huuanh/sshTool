@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="terminal_bg">#FF1E1E2E</color>
+    <color name="terminal_fg">#FFCDD6F4</color>
+    <color name="terminal_cursor">#FFF5E0DC</color>
+    <color name="ansi_black">#FF45475A</color>
+    <color name="ansi_red">#FFF38BA8</color>
+    <color name="ansi_green">#FFA6E3A1</color>
+    <color name="ansi_yellow">#FFF9E2AF</color>
+    <color name="ansi_blue">#FF89B4FA</color>
+    <color name="ansi_magenta">#FFF5C2E7</color>
+    <color name="ansi_cyan">#FF94E2D5</color>
+    <color name="ansi_white">#FFBAC2DE</color>
+    <color name="ansi_bright_black">#FF585B70</color>
+    <color name="ansi_bright_red">#FFF38BA8</color>
+    <color name="ansi_bright_green">#FFA6E3A1</color>
+    <color name="ansi_bright_yellow">#FFF9E2AF</color>
+    <color name="ansi_bright_blue">#FF89B4FA</color>
+    <color name="ansi_bright_magenta">#FFF5C2E7</color>
+    <color name="ansi_bright_cyan">#FF94E2D5</color>
+    <color name="ansi_bright_white">#FFA6ADC8</color>
+</resources>
