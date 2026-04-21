@@ -15,6 +15,7 @@ import com.example.termiusclone.databinding.ActivityTerminalBinding
 import com.example.termiusclone.ssh.SshConnection
 import com.example.termiusclone.ssh.SshState
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class TerminalActivity : AppCompatActivity() {
@@ -52,8 +53,52 @@ class TerminalActivity : AppCompatActivity() {
         }
 
         applyFontSize()
+        applyTheme()
+
+        b.toolbar.inflateMenu(R.menu.menu_terminal)
+        b.toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_send_snippet -> { showSnippetPicker(); true }
+                R.id.action_clear_screen -> { committed.setLength(0); currentLine.setLength(0); cursorCol = 0; flush(); true }
+                else -> false
+            }
+        }
 
         lifecycleScope.launch { startSession(hostId) }
+
+        // If launched with a pre-baked command, push it after Connected.
+        intent.getStringExtra(EXTRA_INITIAL_COMMAND)?.let { initial ->
+            lifecycleScope.launch {
+                conn?.state?.first { it is SshState.Connected }
+                conn?.send(initial.trimEnd('\n') + "\n")
+            }
+        }
+    }
+
+    private fun applyTheme() {
+        val theme = TerminalThemes.current(this)
+        b.outputScroll.setBackgroundColor(theme.bg)
+        b.output.setBackgroundColor(theme.bg)
+        b.output.setTextColor(theme.fg)
+    }
+
+    private fun showSnippetPicker() {
+        lifecycleScope.launch {
+            val list = App.get().db.snippets().all()
+            if (list.isEmpty()) {
+                AlertDialog.Builder(this@TerminalActivity)
+                    .setMessage(R.string.snippet_none_yet)
+                    .setPositiveButton(R.string.action_ok, null)
+                    .show()
+                return@launch
+            }
+            AlertDialog.Builder(this@TerminalActivity)
+                .setTitle(R.string.snippet_pick_title)
+                .setItems(list.map { it.name }.toTypedArray()) { _, which ->
+                    conn?.send(list[which].command.trimEnd('\n') + "\n")
+                }
+                .show()
+        }
     }
 
     private fun applyFontSize() {
@@ -69,10 +114,12 @@ class TerminalActivity : AppCompatActivity() {
         val identity = host.identityId?.let { db.identities().byId(it) }
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         val strict = prefs.getBoolean("strict_host_key", true)
+        val keepAlive = prefs.getString("keep_alive_sec", "0")?.toIntOrNull() ?: 0
+        val autoReconnect = prefs.getBoolean("auto_reconnect", false)
         val alias = host.alias.ifBlank { host.hostname }
         b.toolbar.title = "$alias — ${host.username}@${host.hostname}:${host.port}"
 
-        val c = SshConnection(host, identity, db.knownHosts(), strict)
+        val c = SshConnection(host, identity, db.knownHosts(), strict, keepAlive, autoReconnect)
         conn = c
 
         lifecycleScope.launch {
@@ -271,7 +318,12 @@ class TerminalActivity : AppCompatActivity() {
 
     companion object {
         private const val EXTRA_HOST_ID = "host_id"
+        private const val EXTRA_INITIAL_COMMAND = "initial_command"
         fun intent(ctx: Context, hostId: Long) =
             Intent(ctx, TerminalActivity::class.java).putExtra(EXTRA_HOST_ID, hostId)
+        fun intentWithCommand(ctx: Context, hostId: Long, command: String) =
+            Intent(ctx, TerminalActivity::class.java)
+                .putExtra(EXTRA_HOST_ID, hostId)
+                .putExtra(EXTRA_INITIAL_COMMAND, command)
     }
 }

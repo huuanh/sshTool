@@ -1,5 +1,6 @@
 package com.example.termiusclone.ssh
 
+import android.util.Log
 import com.example.termiusclone.data.db.HostEntity
 import com.example.termiusclone.data.db.IdentityEntity
 import com.example.termiusclone.data.db.KnownHostDao
@@ -43,13 +44,19 @@ class SshConnection(
     private val host: HostEntity,
     private val identity: IdentityEntity?,
     private val knownHostDao: KnownHostDao,
-    private val strictHostKey: Boolean
+    private val strictHostKey: Boolean,
+    private val keepAliveSec: Int = 0,
+    private val autoReconnect: Boolean = false
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var ssh: SSHClient? = null
     private var session: Session? = null
     private var shell: Session.Shell? = null
     private var inputJob: Job? = null
+    private val forwarderThreads = mutableListOf<Thread>()
+    private val localServerSockets = mutableListOf<java.net.ServerSocket>()
+    @Volatile private var manuallyDisconnected = false
+    @Volatile private var reconnectAttempt = 0
 
     private val _state = MutableStateFlow<SshState>(SshState.Idle)
     val state: StateFlow<SshState> = _state.asStateFlow()
@@ -66,6 +73,11 @@ class SshConnection(
             try {
                 val client = SSHClient()
                 client.addHostKeyVerifier(buildVerifier())
+                if (keepAliveSec > 0) {
+                    try {
+                        client.connection.keepAlive.keepAliveInterval = keepAliveSec
+                    } catch (_: Throwable) { /* older sshj */ }
+                }
                 client.connect(host.hostname, host.port)
 
                 SshAuth.authenticate(client, host, identity)
@@ -85,22 +97,86 @@ class SshConnection(
                 session = sess
                 shell = sh
                 _state.value = SshState.Connected
+                reconnectAttempt = 0
+
+                setupPortForwards(client)
 
                 inputJob = scope.launch {
                     val buf = ByteArray(4096)
                     val stream = sh.inputStream
-                    while (true) {
-                        val n = stream.read(buf)
-                        if (n <= 0) break
-                        _output.emit(String(buf, 0, n, Charsets.UTF_8))
-                    }
+                    try {
+                        while (true) {
+                            val n = stream.read(buf)
+                            if (n <= 0) break
+                            _output.emit(String(buf, 0, n, Charsets.UTF_8))
+                        }
+                    } catch (_: Throwable) { /* connection closed */ }
                     _state.value = SshState.Disconnected
+                    if (autoReconnect && !manuallyDisconnected) scheduleReconnect()
                 }
             } catch (e: Throwable) {
                 _state.value = SshState.Error(e.message ?: e::class.java.simpleName)
                 cleanup()
+                if (autoReconnect && !manuallyDisconnected) scheduleReconnect()
             }
         }
+    }
+
+    private fun scheduleReconnect() {
+        reconnectAttempt++
+        val delayMs = (1500L * reconnectAttempt).coerceAtMost(15_000L)
+        scope.launch {
+            kotlinx.coroutines.delay(delayMs)
+            if (!manuallyDisconnected) connect()
+        }
+    }
+
+    private fun setupPortForwards(client: SSHClient) {
+        val forwards = PortForwardParser.parse(host.portForwards)
+        if (forwards.isEmpty()) return
+        for (fwd in forwards) {
+            try {
+                when (fwd) {
+                    is PortForwardSpec.Local -> startLocalForward(client, fwd)
+                    is PortForwardSpec.Remote -> startRemoteForward(client, fwd)
+                }
+            } catch (e: Throwable) {
+                _output.tryEmit("\r\n[port-forward setup failed: ${e.message}]\r\n")
+            }
+        }
+    }
+
+    private fun startLocalForward(client: SSHClient, spec: PortForwardSpec.Local) {
+        val socketAddr = java.net.InetSocketAddress("127.0.0.1", spec.localPort)
+        val server = java.net.ServerSocket()
+        server.reuseAddress = true
+        server.bind(socketAddr)
+        localServerSockets += server
+        val t = Thread({
+            try {
+                val forwarder = client.newLocalPortForwarder(
+                    net.schmizz.sshj.connection.channel.direct.Parameters(
+                        "127.0.0.1", spec.localPort, spec.remoteHost, spec.remotePort
+                    ),
+                    server
+                )
+                forwarder.listen()
+            } catch (e: Throwable) {
+                Log.w("SshConnection", "local fwd ${spec.localPort} ended: ${e.message}")
+            }
+        }, "ssh-local-fwd-${spec.localPort}")
+        t.isDaemon = true
+        t.start()
+        forwarderThreads += t
+    }
+
+    private fun startRemoteForward(client: SSHClient, spec: PortForwardSpec.Remote) {
+        client.remotePortForwarder.bind(
+            net.schmizz.sshj.connection.channel.forwarded.RemotePortForwarder.Forward(spec.remotePort),
+            net.schmizz.sshj.connection.channel.forwarded.SocketForwardingConnectListener(
+                java.net.InetSocketAddress(spec.localHost, spec.localPort)
+            )
+        )
     }
 
     private fun buildVerifier(): HostKeyVerifier = object : HostKeyVerifier {
@@ -177,10 +253,14 @@ class SshConnection(
     fun sendRaw(s: String) = send(s)
 
     fun disconnect() {
+        manuallyDisconnected = true
         scope.launch { cleanup() }
     }
 
     private fun cleanup() {
+        for (s in localServerSockets) try { s.close() } catch (_: Throwable) {}
+        localServerSockets.clear()
+        forwarderThreads.clear()
         try { shell?.close() } catch (_: Throwable) {}
         try { session?.close() } catch (_: Throwable) {}
         try { ssh?.disconnect() } catch (_: Throwable) {}

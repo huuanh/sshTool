@@ -13,6 +13,12 @@ data class HostEntity(
     @ColumnInfo(name = "username") val username: String,
     @ColumnInfo(name = "password") val password: String? = null,
     @ColumnInfo(name = "identity_id") val identityId: Long? = null,
+    /**
+     * Port forwarding rules, one per line.
+     *   L:<localPort>:<remoteHost>:<remotePort>   — local forward
+     *   R:<remotePort>:<localHost>:<localPort>    — remote forward
+     */
+    @ColumnInfo(name = "port_forwards") val portForwards: String? = null,
     @ColumnInfo(name = "created_at") val createdAt: Long = System.currentTimeMillis()
 )
 
@@ -23,7 +29,16 @@ data class IdentityEntity(
     @ColumnInfo(name = "username") val username: String,
     @ColumnInfo(name = "password") val password: String? = null,
     @ColumnInfo(name = "private_key") val privateKey: String? = null,
-    @ColumnInfo(name = "passphrase") val passphrase: String? = null
+    @ColumnInfo(name = "passphrase") val passphrase: String? = null,
+    @ColumnInfo(name = "public_key") val publicKey: String? = null
+)
+
+@Entity(tableName = "snippets")
+data class SnippetEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @ColumnInfo(name = "name") val name: String,
+    @ColumnInfo(name = "command") val command: String,
+    @ColumnInfo(name = "created_at") val createdAt: Long = System.currentTimeMillis()
 )
 
 @Entity(tableName = "known_hosts", primaryKeys = ["host", "port"])

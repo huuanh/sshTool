@@ -77,6 +77,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.4")
     implementation("androidx.preference:preference-ktx:1.2.1")
+    implementation("androidx.biometric:biometric:1.1.0")
 
     // Room
     val room = "2.6.1"

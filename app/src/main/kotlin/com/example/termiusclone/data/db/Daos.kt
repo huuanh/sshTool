@@ -13,6 +13,9 @@ interface HostDao {
     @Query("SELECT * FROM hosts ORDER BY alias COLLATE NOCASE ASC")
     fun observeAll(): Flow<List<HostEntity>>
 
+    @Query("SELECT * FROM hosts ORDER BY alias COLLATE NOCASE ASC")
+    suspend fun allOnce(): List<HostEntity>
+
     @Query("SELECT * FROM hosts WHERE id = :id")
     suspend fun byId(id: Long): HostEntity?
 
@@ -60,4 +63,25 @@ interface KnownHostDao {
 
     @Query("DELETE FROM known_hosts WHERE host = :host AND port = :port")
     suspend fun remove(host: String, port: Int)
+}
+
+@Dao
+interface SnippetDao {
+    @Query("SELECT * FROM snippets ORDER BY name COLLATE NOCASE ASC")
+    fun observeAll(): Flow<List<SnippetEntity>>
+
+    @Query("SELECT * FROM snippets ORDER BY name COLLATE NOCASE ASC")
+    suspend fun all(): List<SnippetEntity>
+
+    @Query("SELECT * FROM snippets WHERE id = :id")
+    suspend fun byId(id: Long): SnippetEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(entity: SnippetEntity): Long
+
+    @Update
+    suspend fun update(entity: SnippetEntity)
+
+    @Delete
+    suspend fun delete(entity: SnippetEntity)
 }

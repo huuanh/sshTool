@@ -55,5 +55,16 @@
             android:label="@string/sftp_title"
             android:windowSoftInputMode="adjustResize" />
 
+        <activity
+            android:name=".ui.snippets.SnippetEditorActivity"
+            android:exported="false"
+            android:label="@string/snippet_editor_title"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.knownhosts.KnownHostsActivity"
+            android:exported="false"
+            android:label="@string/known_hosts_title" />
+
     </application>
 </manifest>

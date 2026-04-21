@@ -5,6 +5,10 @@
         android:icon="@drawable/ic_nav_hosts"
         android:title="@string/nav_hosts" />
     <item
+        android:id="@+id/nav_snippets"
+        android:icon="@drawable/ic_nav_snippets"
+        android:title="@string/nav_snippets" />
+    <item
         android:id="@+id/nav_identities"
         android:icon="@drawable/ic_nav_identities"
         android:title="@string/nav_identities" />

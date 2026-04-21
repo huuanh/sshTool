@@ -55,6 +55,7 @@ class HostEditorActivity : AppCompatActivity() {
             b.inputPort.setText(host.port.toString())
             b.inputUsername.setText(host.username)
             b.inputPassword.setText(host.password ?: "")
+            b.inputPortForwards.setText(host.portForwards ?: "")
             selectedIdentityId = host.identityId
             val idx = identities.indexOfFirst { it.id == host.identityId }
             if (idx >= 0) b.dropdownIdentity.setText(labels[idx + 1], false)
@@ -77,7 +78,8 @@ class HostEditorActivity : AppCompatActivity() {
             port = port,
             username = username,
             password = b.inputPassword.text.toString().takeIf { it.isNotEmpty() },
-            identityId = selectedIdentityId
+            identityId = selectedIdentityId,
+            portForwards = b.inputPortForwards.text.toString().takeIf { it.isNotBlank() }
         )
         lifecycleScope.launch {
             val dao = App.get().db.hosts()

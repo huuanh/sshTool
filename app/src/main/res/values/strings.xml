@@ -84,4 +84,61 @@
     <string name="sftp_error_prefix">SFTP error: %1$s</string>
     <string name="sftp_no_picker">No file picker available on this device</string>
     <string name="action_files">Files</string>
+
+    <!-- Snippets -->
+    <string name="nav_snippets">Snippets</string>
+    <string name="snippets_empty">No snippets yet.\nTap + to add a reusable command.</string>
+    <string name="snippet_editor_title">Snippet</string>
+    <string name="snippet_hint_name">Name</string>
+    <string name="snippet_hint_command">Command (use \\n for new lines)</string>
+    <string name="snippet_run_title">Run \"%1$s\" on…</string>
+    <string name="snippet_no_hosts">Add a host first.</string>
+    <string name="snippet_pick_title">Send snippet</string>
+    <string name="snippet_none_yet">No snippets defined yet. Add one in the Snippets tab.</string>
+    <string name="terminal_action_send_snippet">Snippet</string>
+    <string name="action_ok">OK</string>
+    <string name="action_close">Close</string>
+    <string name="action_copy">Copy</string>
+
+    <!-- Identity generate -->
+    <string name="identity_action_generate_key">Generate RSA key</string>
+    <string name="identity_generate_title">Generate SSH key</string>
+    <string name="identity_generate_confirm">Generate a fresh RSA-2048 keypair? The new private key will overwrite anything currently in the field.</string>
+    <string name="identity_generate_done_title">Public key</string>
+    <string name="identity_generate_done_msg">Add this line to ~/.ssh/authorized_keys on the server:\n\n%1$s</string>
+    <string name="identity_public_copied">Public key copied to clipboard</string>
+
+    <!-- Host advanced -->
+    <string name="host_hint_port_forwards">Port forwards</string>
+    <string name="host_help_port_forwards">One per line. L:8080:host:80 (local) or R:9000:127.0.0.1:9000 (remote)</string>
+
+    <!-- Settings -->
+    <string name="settings_terminal_category">Terminal</string>
+    <string name="settings_connection_category">Connection</string>
+    <string name="settings_security_category">Security</string>
+    <string name="settings_backup_category">Backup</string>
+    <string name="settings_terminal_theme">Color theme</string>
+    <string name="settings_strict_host_key_summary">Refuse new host fingerprints. Connect once with this off to accept, then re-enable.</string>
+    <string name="settings_auto_reconnect">Auto reconnect</string>
+    <string name="settings_auto_reconnect_summary">Try to re-establish dropped sessions automatically.</string>
+    <string name="settings_keep_alive">Keep-alive interval (seconds)</string>
+    <string name="settings_keep_alive_summary">0 = disabled. 30 is a good value over flaky mobile networks.</string>
+    <string name="settings_known_hosts">Known hosts</string>
+    <string name="settings_known_hosts_summary">Manage saved server fingerprints.</string>
+    <string name="settings_app_lock">Biometric / device-credential lock</string>
+    <string name="settings_app_lock_summary">Require fingerprint or PIN to open the app.</string>
+    <string name="settings_export">Export backup (JSON)</string>
+    <string name="settings_export_summary">Save hosts, identities and snippets to a JSON file.</string>
+    <string name="settings_import">Import backup (JSON)</string>
+    <string name="settings_import_summary">Append data from a previously exported JSON.</string>
+
+    <string name="backup_exported">Backup written.</string>
+    <string name="backup_imported">Imported %1$d hosts, %2$d identities, %3$d snippets.</string>
+    <string name="backup_failed">Backup error: %1$s</string>
+
+    <!-- Known hosts -->
+    <string name="known_hosts_title">Known hosts</string>
+    <string name="known_hosts_empty">No saved fingerprints yet.</string>
+    <string name="known_hosts_remove_title">Forget fingerprint?</string>
+    <string name="known_hosts_remove_msg">Remove the saved fingerprint for %1$s? Next connection will prompt to verify again.</string>
 </resources>

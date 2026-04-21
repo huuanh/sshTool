@@ -13,7 +13,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/bg_primary"
         app:navigationIcon="@drawable/ic_close"
-        app:title="@string/title_identity_editor"
+        app:title="@string/snippet_editor_title"
         app:titleTextColor="@color/text_primary" />
 
     <ScrollView
@@ -31,7 +31,7 @@
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_identity_name">
+                android:hint="@string/snippet_hint_name">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/input_name"
                     android:layout_width="match_parent"
@@ -44,69 +44,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:hint="@string/hint_identity_username">
+                android:hint="@string/snippet_hint_command">
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/input_username"
+                    android:id="@+id/input_command"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="@string/hint_identity_password"
-                app:passwordToggleEnabled="true">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/input_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPassword" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="@string/hint_identity_passphrase"
-                app:passwordToggleEnabled="true">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/input_passphrase"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPassword" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="@string/hint_identity_private_key">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/input_private_key"
-                    android:layout_width="match_parent"
-                    android:layout_height="180dp"
+                    android:layout_height="220dp"
                     android:fontFamily="monospace"
                     android:gravity="top|start"
                     android:inputType="textMultiLine|textNoSuggestions"
                     android:scrollbars="vertical"
-                    android:textSize="12sp" />
+                    android:textSize="13sp" />
             </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_generate_key"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/identity_action_generate_key"
-                android:textColor="@color/text_primary"
-                app:icon="@drawable/ic_key"
-                app:iconTint="@color/brand_blue" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_save"
