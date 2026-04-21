@@ -9,7 +9,8 @@ import com.example.termiusclone.databinding.ItemHostBinding
 
 class HostsAdapter(
     private val onClick: (HostEntity) -> Unit,
-    private val onConnect: (HostEntity) -> Unit
+    private val onConnect: (HostEntity) -> Unit,
+    private val onFiles: (HostEntity) -> Unit
 ) : RecyclerView.Adapter<HostsAdapter.VH>() {
 
     private val items = mutableListOf<HostEntity>()
@@ -44,5 +45,6 @@ class HostsAdapter(
         holder.binding.textTarget.text = "${host.username}@${host.hostname}:${host.port}"
         holder.binding.root.setOnClickListener { onClick(host) }
         holder.binding.btnConnect.setOnClickListener { onConnect(host) }
+        holder.binding.btnFiles.setOnClickListener { onFiles(host) }
     }
 }

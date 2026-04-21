@@ -20,7 +20,6 @@ import kotlinx.coroutines.withContext
 import net.schmizz.sshj.SSHClient
 import net.schmizz.sshj.connection.channel.direct.Session
 import net.schmizz.sshj.transport.verification.HostKeyVerifier
-import net.schmizz.sshj.userauth.password.PasswordUtils
 import java.io.OutputStream
 import java.security.PublicKey
 
@@ -69,8 +68,7 @@ class SshConnection(
                 client.addHostKeyVerifier(buildVerifier())
                 client.connect(host.hostname, host.port)
 
-                val username = host.username.ifBlank { identity?.username ?: "root" }
-                authenticate(client, username)
+                SshAuth.authenticate(client, host, identity)
 
                 val sess = client.startSession()
                 // Use xterm-256color so bash/readline emits standard CSI sequences
@@ -103,78 +101,6 @@ class SshConnection(
                 cleanup()
             }
         }
-    }
-
-    private suspend fun authenticate(client: SSHClient, username: String) = withContext(Dispatchers.IO) {
-        val key = identity?.privateKey?.takeIf { it.isNotBlank() }
-        val pass = host.password?.takeIf { it.isNotBlank() } ?: identity?.password?.takeIf { it.isNotBlank() }
-
-        if (key == null && pass == null) {
-            error("No password or private key provided")
-        }
-
-        val errors = mutableListOf<String>()
-
-        // 1) public key
-        if (key != null) {
-            try {
-                val passphrase = identity?.passphrase
-                // Use SSHClient.loadKeys which auto-detects format (PEM, OpenSSH v1, PuTTY...)
-                val keyProvider = if (passphrase.isNullOrEmpty()) {
-                    client.loadKeys(key, null, null)
-                } else {
-                    client.loadKeys(key, null, PasswordUtils.createOneOff(passphrase.toCharArray()))
-                }
-                client.authPublickey(username, keyProvider)
-                return@withContext
-            } catch (e: Throwable) {
-                errors += "publickey: ${e.message ?: e::class.java.simpleName}"
-            }
-        }
-
-        // 2) password
-        if (pass != null) {
-            try {
-                client.authPassword(username, pass)
-                return@withContext
-            } catch (e: Throwable) {
-                errors += "password: ${e.message ?: e::class.java.simpleName}"
-            }
-
-            // 3) keyboard-interactive (many servers disable plain password but accept this)
-            try {
-                val finder = object : net.schmizz.sshj.userauth.password.PasswordFinder {
-                    override fun reqPassword(resource: net.schmizz.sshj.userauth.password.Resource<*>?): CharArray =
-                        pass.toCharArray()
-                    override fun shouldRetry(resource: net.schmizz.sshj.userauth.password.Resource<*>?): Boolean = false
-                }
-                val provider = net.schmizz.sshj.userauth.method.PasswordResponseProvider(finder)
-                client.auth(username, net.schmizz.sshj.userauth.method.AuthKeyboardInteractive(provider))
-                return@withContext
-            } catch (e: Throwable) {
-                errors += "keyboard-interactive: ${e.message ?: e::class.java.simpleName}"
-            }
-        }
-
-        // Build a helpful error message
-        val allowed = try {
-            client.userAuth?.allowedMethods?.joinToString(",") ?: "unknown"
-        } catch (_: Throwable) { "unknown" }
-
-        val hint = buildString {
-            if (key != null && pass == null) {
-                append(" Hint: server rejected the key. Check that the matching public key is in ")
-                append("~/.ssh/authorized_keys on the server, the username '")
-                append(username)
-                append("' is correct, or add a password as a fallback.")
-            } else if (key == null && pass != null) {
-                append(" Hint: server rejected the password. Check username '")
-                append(username)
-                append("' and password, or the server may require a key.")
-            }
-        }
-
-        error("Authentication failed (user='$username', server allows: $allowed). Tried: ${errors.joinToString("; ")}.$hint")
     }
 
     private fun buildVerifier(): HostKeyVerifier = object : HostKeyVerifier {

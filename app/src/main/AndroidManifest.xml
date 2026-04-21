@@ -49,5 +49,11 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:windowSoftInputMode="adjustResize|stateVisible" />
 
+        <activity
+            android:name=".ui.sftp.SftpActivity"
+            android:exported="false"
+            android:label="@string/sftp_title"
+            android:windowSoftInputMode="adjustResize" />
+
     </application>
 </manifest>

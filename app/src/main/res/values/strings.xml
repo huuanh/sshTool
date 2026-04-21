@@ -66,4 +66,22 @@
     <string name="terminal_fingerprint_dialog_msg">The authenticity of host \"%1$s\" can\'t be established.\n\nKey fingerprint:\n%2$s\n\nAccept and continue?</string>
     <string name="action_accept">Accept</string>
     <string name="action_cancel">Cancel</string>
+
+    <!-- SFTP -->
+    <string name="sftp_title">Files</string>
+    <string name="sftp_empty">Empty directory</string>
+    <string name="sftp_upload">Upload file</string>
+    <string name="sftp_action_mkdir">New folder</string>
+    <string name="sftp_action_refresh">Refresh</string>
+    <string name="sftp_action_open">Open</string>
+    <string name="sftp_action_download">Download</string>
+    <string name="sftp_action_rename">Rename</string>
+    <string name="sftp_action_delete">Delete</string>
+    <string name="sftp_mkdir_hint">Folder name</string>
+    <string name="sftp_delete_confirm">Delete \"%1$s\"? This cannot be undone.</string>
+    <string name="sftp_downloaded">Downloaded %1$d bytes</string>
+    <string name="sftp_uploaded">Uploaded %1$s (%2$d bytes)</string>
+    <string name="sftp_error_prefix">SFTP error: %1$s</string>
+    <string name="sftp_no_picker">No file picker available on this device</string>
+    <string name="action_files">Files</string>
 </resources>

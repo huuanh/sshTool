@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_mkdir"
+        android:icon="@drawable/ic_create_folder"
+        android:title="@string/sftp_action_mkdir"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_refresh"
+        android:title="@string/sftp_action_refresh"
+        app:showAsAction="never" />
+
+</menu>

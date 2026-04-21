@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.termiusclone.App
 import com.example.termiusclone.databinding.FragmentHostsBinding
 import com.example.termiusclone.ui.hosteditor.HostEditorActivity
+import com.example.termiusclone.ui.sftp.SftpActivity
 import com.example.termiusclone.ui.terminal.TerminalActivity
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -29,7 +30,8 @@ class HostsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         adapter = HostsAdapter(
             onClick = { host -> startActivity(HostEditorActivity.editIntent(requireContext(), host.id)) },
-            onConnect = { host -> startActivity(TerminalActivity.intent(requireContext(), host.id)) }
+            onConnect = { host -> startActivity(TerminalActivity.intent(requireContext(), host.id)) },
+            onFiles = { host -> startActivity(SftpActivity.intent(requireContext(), host.id)) }
         )
         b.recycler.layoutManager = LinearLayoutManager(requireContext())
         b.recycler.adapter = adapter
