@@ -2,35 +2,52 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:name=".SshToolApplication"
-        android:allowBackup="true"
+        android:name=".App"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SshTool">
+        android:theme="@style/Theme.TermiusClone"
+        android:usesCleartextTraffic="false">
 
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:exported="true"
-            android:windowSoftInputMode="adjustResize"
-            android:theme="@style/Theme.SshTool">
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.TermiusClone">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="ssh" />
+            </intent-filter>
         </activity>
 
-        <service
-            android:name=".service.SshSessionService"
-            android:foregroundServiceType="specialUse"
-            android:exported="false" />
+        <activity
+            android:name=".ui.hosteditor.HostEditorActivity"
+            android:exported="false"
+            android:label="@string/title_host_editor"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.identities.IdentityEditorActivity"
+            android:exported="false"
+            android:label="@string/title_identity_editor"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.terminal.TerminalActivity"
+            android:exported="false"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:windowSoftInputMode="adjustResize|stateVisible" />
+
     </application>
 </manifest>

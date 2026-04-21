@@ -12,6 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-
-rootProject.name = "SshTool"
+rootProject.name = "TermiusClone"
 include(":app")

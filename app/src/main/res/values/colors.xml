@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="terminal_bg">#FF1E1E2E</color>
-    <color name="terminal_fg">#FFCDD6F4</color>
-    <color name="terminal_cursor">#FFF5E0DC</color>
-    <color name="ansi_black">#FF45475A</color>
-    <color name="ansi_red">#FFF38BA8</color>
-    <color name="ansi_green">#FFA6E3A1</color>
-    <color name="ansi_yellow">#FFF9E2AF</color>
-    <color name="ansi_blue">#FF89B4FA</color>
-    <color name="ansi_magenta">#FFF5C2E7</color>
-    <color name="ansi_cyan">#FF94E2D5</color>
-    <color name="ansi_white">#FFBAC2DE</color>
-    <color name="ansi_bright_black">#FF585B70</color>
-    <color name="ansi_bright_red">#FFF38BA8</color>
-    <color name="ansi_bright_green">#FFA6E3A1</color>
-    <color name="ansi_bright_yellow">#FFF9E2AF</color>
-    <color name="ansi_bright_blue">#FF89B4FA</color>
-    <color name="ansi_bright_magenta">#FFF5C2E7</color>
-    <color name="ansi_bright_cyan">#FF94E2D5</color>
-    <color name="ansi_bright_white">#FFA6ADC8</color>
+    <!-- Termius-inspired palette -->
+    <color name="brand_blue">#558BFC</color>
+    <color name="brand_blue_dark">#3F6FD8</color>
+    <color name="brand_blue_light">#7BA6FF</color>
+
+    <!-- Dark theme greys -->
+    <color name="bg_primary">#141729</color>
+    <color name="bg_secondary">#1C2038</color>
+    <color name="bg_elevated">#272B45</color>
+    <color name="bg_card">#222640</color>
+    <color name="surface_divider">#2E3354</color>
+
+    <color name="text_primary">#F2F4FA</color>
+    <color name="text_secondary">#A6ADCC</color>
+    <color name="text_tertiary">#6C748F</color>
+
+    <color name="status_ok">#3BCB7F</color>
+    <color name="status_error">#E25C5C</color>
+    <color name="status_warn">#E0B341</color>
+
+    <color name="terminal_bg">#0E1020</color>
+    <color name="terminal_fg">#E6E6E6</color>
 </resources>
