@@ -3,6 +3,8 @@ package com.example.termiusclone.ui.terminal
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AlertDialog
@@ -59,7 +61,7 @@ class TerminalActivity : AppCompatActivity() {
         b.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_send_snippet -> { showSnippetPicker(); true }
-                R.id.action_clear_screen -> { committed.setLength(0); currentLine.setLength(0); cursorCol = 0; flush(); true }
+                R.id.action_clear_screen -> { committed.setLength(0); currentLine.setLength(0); cursorCol = 0; scheduleFlush(); true }
                 else -> false
             }
         }
@@ -138,7 +140,7 @@ class TerminalActivity : AppCompatActivity() {
         lifecycleScope.launch {
             c.output.collect { chunk ->
                 feed(chunk)
-                b.outputScroll.post { b.outputScroll.fullScroll(android.view.View.FOCUS_DOWN) }
+                scheduleFlush()
             }
         }
 
@@ -190,7 +192,19 @@ class TerminalActivity : AppCompatActivity() {
                 EscState.CHARSET -> escState = EscState.TEXT
             }
         }
-        flush()
+        trimCommitted()
+    }
+
+    /** Keep at most ~200 KB of scrollback to bound MeasuredText cost. */
+    private fun trimCommitted() {
+        val max = MAX_SCROLLBACK_CHARS
+        if (committed.length > max) {
+            val drop = committed.length - max
+            // Trim to next newline so we don't cut a line in half.
+            val nl = committed.indexOf('\n', drop)
+            val cut = if (nl >= 0) nl + 1 else drop
+            committed.delete(0, cut)
+        }
     }
 
     private fun handleText(c: Char) {
@@ -287,6 +301,20 @@ class TerminalActivity : AppCompatActivity() {
         }
     }
 
+    private val flushHandler = Handler(Looper.getMainLooper())
+    private var flushPending = false
+    private val flushRunnable = Runnable {
+        flushPending = false
+        flush()
+        b.outputScroll.fullScroll(android.view.View.FOCUS_DOWN)
+    }
+
+    private fun scheduleFlush() {
+        if (flushPending) return
+        flushPending = true
+        flushHandler.postDelayed(flushRunnable, FLUSH_INTERVAL_MS)
+    }
+
     private fun flush() {
         b.output.text = committed.toString() + currentLine.toString()
     }
@@ -312,6 +340,7 @@ class TerminalActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        flushHandler.removeCallbacksAndMessages(null)
         pendingDialog?.dismiss()
         conn?.disconnect()
     }
@@ -319,6 +348,8 @@ class TerminalActivity : AppCompatActivity() {
     companion object {
         private const val EXTRA_HOST_ID = "host_id"
         private const val EXTRA_INITIAL_COMMAND = "initial_command"
+        private const val FLUSH_INTERVAL_MS = 33L
+        private const val MAX_SCROLLBACK_CHARS = 200_000
         fun intent(ctx: Context, hostId: Long) =
             Intent(ctx, TerminalActivity::class.java).putExtra(EXTRA_HOST_ID, hostId)
         fun intentWithCommand(ctx: Context, hostId: Long, command: String) =
